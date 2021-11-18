@@ -11,6 +11,7 @@ public class MyMicStuff : MonoBehaviour
     public bool outputToText = false;
     public bool outputRawToText = false;
     public AudioMixer mixer;
+    public int rawAudioResolution = 10;
 
     AudioClip mic;
     List<AudioSource> audsrc;
@@ -18,12 +19,16 @@ public class MyMicStuff : MonoBehaviour
     float[] eqVals;
     float[] tmpVals;
     int numEqVals;
+    int numRawAudioVals;
+    bool listeningToSpectrumData;
+    bool listeningToVolume;
 
     string outfilename;
     string rawoutfilename;
     StreamWriter sw;
     StreamWriter rsw;
     float[] rawAudio;
+    float volume;
 
     void Awake()
     {
@@ -32,7 +37,10 @@ public class MyMicStuff : MonoBehaviour
         tmpVals = new float[numEqVals];
         outfilename = "Assets/eqvals.txt";
         rawoutfilename = "Assets/rawAudio.txt";
-        rawAudio = new float[numEqVals];
+        numRawAudioVals = (int)Mathf.Pow(2.0f, (float)rawAudioResolution);
+        rawAudio = new float[numRawAudioVals];
+        listeningToSpectrumData = false;
+        listeningToVolume = false;
     }
 
     // Start is called before the first frame update
@@ -79,6 +87,8 @@ public class MyMicStuff : MonoBehaviour
 
     public float[] getEqVals()
     {
+        Debug.Log("Someone's asking for eq vals");
+        listeningToSpectrumData = true;
         return eqVals;
     }
 
@@ -87,33 +97,53 @@ public class MyMicStuff : MonoBehaviour
         return eqResolution;
     }
 
+    public float getVolume()
+    {
+        listeningToVolume = true;
+        return volume;
+    }
+
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (audsrc.Count == 1)
-        {
-            audsrc[0].GetSpectrumData(eqVals, 0, FFTWindow.Rectangular);
-        }
-        else
-        {
-            for (int i = 0; i < eqVals.Length; i++)
-                eqVals[i] = 0;
 
-            foreach (AudioSource a in audsrc)
+        if (listeningToSpectrumData)
+        {
+            if (audsrc.Count == 1)
             {
-                a.GetSpectrumData(tmpVals, 0, FFTWindow.Rectangular);
-                for (int i = 0; i < eqVals.Length; i++)
-                    eqVals[i] += tmpVals[i];
+                audsrc[0].GetSpectrumData(eqVals, 0, FFTWindow.Rectangular);
             }
+            else
+            {
+                for (int i = 0; i < eqVals.Length; i++)
+                    eqVals[i] = 0;
+
+                foreach (AudioSource a in audsrc)
+                {
+                    a.GetSpectrumData(tmpVals, 0, FFTWindow.Rectangular);
+                    for (int i = 0; i < eqVals.Length; i++)
+                        eqVals[i] += tmpVals[i];
+                }
+            }
+
+            if (outputToText)
+                sw.WriteLine(string.Join(",", eqVals));
         }
 
-        if (outputToText)
-            sw.WriteLine(string.Join(",", eqVals));
-
-        if (outputRawToText)
+        if (listeningToVolume)
         {
             audsrc[0].GetOutputData(rawAudio, 0);
-            rsw.WriteLine(string.Join(",", rawAudio));
+            volume = 0;
+            foreach (float f in rawAudio)
+            {
+                float fa = Mathf.Abs(f);
+                volume += fa * fa;
+            }
+
+            if (outputRawToText)
+            {
+                rsw.WriteLine(string.Join(",", rawAudio));
+            }
         }
 
     }

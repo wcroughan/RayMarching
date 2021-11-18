@@ -67,7 +67,7 @@ Material:
     - _MaxSteps: 100
     - _Metallic: 0
     - _Mode: 0
-    - _NumSpheres: 5
+    - _NumSpheres: 20
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0

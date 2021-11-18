@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.4465785, g: 0.49641252, b: 0.574817, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -232,8 +232,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blobSpeed: 1
-  newGoalProb: 0.03
-  numSpheres: 5
+  newGoalProb: 0.01
+  numSpheres: 20
   syncFactor: 0.02
   eqNewGoalProb: 10
   volumeGrowthFactor: 1
@@ -270,6 +270,7 @@ MonoBehaviour:
   outputToText: 0
   outputRawToText: 1
   mixer: {fileID: 24100000, guid: eefb3006776e0fffda0a2b87f03c69e9, type: 2}
+  rawAudioResolution: 6
 --- !u!4 &373661334
 Transform:
   m_ObjectHideFlags: 0
